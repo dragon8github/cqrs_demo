@@ -1,9 +1,15 @@
 "use strict";
+const validator = require('validator');
 const Domain = require('cqrs');
 const Actor = Domain.Actor;
 
+let _validator = (title,body) => {
+    return title && body && validator.isLength(title,{min:2,max:30}) && validator.isLength(body,{min:2,max:1000});
+}
+
 class Topic extends Actor{
     constructor(data){
+        if(!_validator(data.title,data.body)){throw new Error('create error')};
         super({
             authorId:data.authorId,
             title:data.title,
@@ -37,6 +43,7 @@ class Topic extends Actor{
     }
     //访问
     update(data,service){
+        if(!_validator(data.title,data.body)){throw new Error('update error')};
         service.apply('update',{title:data.title,body:data.body})
     }
 
